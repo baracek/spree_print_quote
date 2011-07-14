@@ -91,7 +91,7 @@ pdf.bounding_box [0, pdf.cursor], :width => 540, :height => 450 do
     :vertical_padding   => 2,
     :horizontal_padding => 6,
     :font_size => 9,
-    :column_widths => { 0 => 75, 1 => 290, 2 => 75, 3 => 50, 4 => 50 } ,
+    :column_widths => { 0 => 100, 1 => 265, 2 => 75, 3 => 50, 4 => 50 } ,
     :align => { 0 => :left, 1 => :left, 2 => :right, 3 => :right, 4 => :right }
 
   pdf.move_down 4
@@ -102,7 +102,7 @@ pdf.bounding_box [0, pdf.cursor], :width => 540, :height => 450 do
     pdf.move_down 2
     data2 = []
     @order.line_items.each do |item|
-      data2 << [item.variant.product.sku,
+      data2 << [item.variant.respond_to?('sku') ? item.variant.sku : item.variant.product.sku,
                 item.variant.product.name,
                 number_to_currency(item.price),
                 item.quantity,
@@ -116,7 +116,7 @@ pdf.bounding_box [0, pdf.cursor], :width => 540, :height => 450 do
       :vertical_padding   => 5,
       :horizontal_padding => 6,
       :font_size => 9,
-      :column_widths => { 0 => 75, 1 => 290, 2 => 75, 3 => 50, 4 => 50 },
+      :column_widths => { 0 => 100, 1 => 265, 2 => 75, 3 => 50, 4 => 50 },
       :align => { 0 => :left, 1 => :left, 2 => :right, 3 => :right, 4 => :right }
   end
 
