@@ -21,8 +21,8 @@ pdf.font "Helvetica", :style => :bold, :size => 14
 pdf.text "Order Number: #{@order.number}"
 
 pdf.font "Helvetica", :size => 8
-if @order.completed_at.blank? == false
-   pdf.text @order.completed_at.to_s(:long)
+if @order.created_at.blank? == false
+   pdf.text @order.created_at.to_s(:long)
 end
 
 # Address Stuff
