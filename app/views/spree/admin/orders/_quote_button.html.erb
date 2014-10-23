@@ -1,0 +1,3 @@
+<% if @order %>
+  <li><%= link_to(Spree.t( :print_quote ), spree.quote_admin_order_url(@order, :pdf), :class => "button icon-print", :icon => 'icon-print' ) %></li>
+<% end %>  

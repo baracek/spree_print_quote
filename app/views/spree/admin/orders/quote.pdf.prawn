@@ -6,16 +6,18 @@ ship_address = @order.ship_address ? @order.ship_address : Address.new
 
 pdf.font "Helvetica"
 
-pdf.image File.join( Rails.root, "public", Spree::PrintSettings::Config[:print_logo_path] ), :at => [0,720], :scale => 0.65
+im = Rails.application.assets.find_asset( SpreePrintSettings::Config[:print_logo_path] )
+
+pdf.image im, :at => [0,720], :scale => 0.65
 
 pdf.fill_color "005D99"
 pdf.text "Customer Quote", :align => :center, :style => :bold, :size => 22
 pdf.fill_color "000000"
 
-pdf.text Spree::PrintSettings::Config[:print_company_name], :style => :bold, :align => :right, :size=>16
-pdf.text Spree::PrintSettings::Config[:print_company_address1], :align => :right, :size=>14
-pdf.text Spree::PrintSettings::Config[:print_company_address2], :align => :right, :size=>14
-pdf.text Spree::PrintSettings::Config[:print_company_phone], :align => :right, :size=>14
+pdf.text SpreePrintSettings::Config[:print_company_name], :style => :bold, :align => :right, :size=>16
+pdf.text SpreePrintSettings::Config[:print_company_address1], :align => :right, :size=>14
+pdf.text SpreePrintSettings::Config[:print_company_address2], :align => :right, :size=>14
+pdf.text SpreePrintSettings::Config[:print_company_phone], :align => :right, :size=>14
 
 pdf.font "Helvetica", :style => :bold, :size => 14
 pdf.text "Order Number: #{@order.number}"
@@ -77,7 +79,7 @@ end
 pdf.move_down 30
 
 # Line Items
-pdf.bounding_box [0, pdf.cursor], :width => 540, :height => 450 do
+pdf.bounding_box [0, pdf.cursor], :width => 540, :height => 440 do
   pdf.move_down 2
   data =  [[Prawn::Table::Cell.new( :text => "SKU", :font_style => :bold),
                 Prawn::Table::Cell.new( :text =>"Item Description", :font_style => :bold ),
@@ -108,8 +110,7 @@ pdf.bounding_box [0, pdf.cursor], :width => 540, :height => 450 do
                 item.quantity,
                 number_to_currency(item.price * item.quantity)]
     end
-
-
+	
     pdf.table data2,
       :position           => :center,
       :border_width => 0,
@@ -124,13 +125,13 @@ pdf.bounding_box [0, pdf.cursor], :width => 540, :height => 450 do
 
   totals = []
 
-  totals << [Prawn::Table::Cell.new( :text => "Subtotal:", :font_style => :bold), number_to_currency(@order.item_total)]
+  totals << [Prawn::Table::Cell.new( :text => "Subtotal:", :font_style => :bold), @order.display_item_total]
 
-  @order.adjustments.each do |adjustment|
-    totals << [Prawn::Table::Cell.new( :text => adjustment.label + ":", :font_style => :bold), number_to_currency(adjustment.amount)]
-  end
+  totals << [Prawn::Table::Cell.new( :text => "Shipping:", :font_style => :bold), @order.display_shipment_total]
 
-  totals << [Prawn::Table::Cell.new( :text => "Order Total:", :font_style => :bold), number_to_currency(@order.total)]
+  totals << [Prawn::Table::Cell.new( :text => "Taxes:", :font_style => :bold), @order.display_additional_tax_total]
+
+  totals << [Prawn::Table::Cell.new( :text => "Order Total:", :font_style => :bold), @order.display_total]
 
   pdf.bounding_box [ pdf.bounds.right - 500, pdf.bounds.bottom + (totals.length * 15)], :width => 500 do
     pdf.table totals,
@@ -164,6 +165,6 @@ In order to return a product prior authorization with a RMA number is mandatory
 All returned items must be in original un-opened packaging with seal intact.
 EOS
   pdf.move_down 2
-  pdf.text Spree::PrintSettings::Config[:print_company_website], :align => :right, :size=>10
-  pdf.text_box footer_message, :at => [ pdf.margin_box.left, pdf.margin_box.bottom + 30], :size => 8
+  pdf.text SpreePrintSettings::Config[:print_company_website], :align => :right, :size=>10
+  pdf.text_box footer_message, :at => [ pdf.margin_box.left, pdf.margin_box.bottom + 40], :size => 8
 end
